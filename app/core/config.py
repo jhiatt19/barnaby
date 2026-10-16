@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     
     # AI Engine Endpoints
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    TEXT_MODEL: str = "qwen2.5:7b"
+    TEXT_MODEL: str = "qwen2.5:14b"
     VISION_MODEL: str = "qwen2-vl:latest"  # or llava:latest
     WHISPER_MODEL_SIZE: str = "small.en"  # Optimized for speed on 5060 Ti
     

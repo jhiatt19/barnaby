@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Scribe: BARNABY</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Clarity+City:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="all.css">
+    </head>
+    <body>
+        <noscript>You need to enable JavaScript to run this app</noscript>
+        <header>
+            <h1>Barnaby: Clinical Scribe</h1>
+        </header>
+        <main>
+            <form id="new_patient">
+                <div class="new_patient_group">
+                    <label for="patient_id">Patient Name/Alias:</label>
+                    <input type="text" id="patient_id">
+                    <button type="submit">Begin Recording</button>
+                </div>
+            </form>
+            <table id="sessions">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient Name</th>
+                        <th>To do:</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+
+            </table>
+            <script type="module" src="index.js"></script>
+        </main>
+    </body>
+</html>

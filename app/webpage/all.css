@@ -1,0 +1,16 @@
+body {
+    display:grid;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+h1 {
+    justify-content: center;
+}
+
+table {
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+}

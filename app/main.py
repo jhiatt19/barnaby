@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from contextlib import asynccontextmanager
 import logging
 
@@ -31,6 +33,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/ui", StaticFiles(directory="app/webpage",html=True), name="webpage")
+
 # Mount Endpoint Modules
 app.include_router(scribe.router, prefix="/api/v1/scribe", tags=["Medical Scribe"])
 # app.include_router(cameras.router, prefix="/api/v1/cameras", tags=["Tapo Cameras"])
@@ -38,3 +42,7 @@ app.include_router(scribe.router, prefix="/api/v1/scribe", tags=["Medical Scribe
 @app.get("/health")
 async def health_check():
     return {"status": "online", "gpu_status": "RTX 5060 Ti Active"}
+
+@app.get("/")
+async def root_redirect():
+    return RedirectResponse(url="/ui/index.html")

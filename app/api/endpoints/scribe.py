@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, UploadFile, File
+from fastapi import APIRouter, HTTPException, BackgroundTasks, UploadFile, File, Form
 from pydantic import BaseModel
 from app.services.scribe_memory import scribe_memory
 import httpx
@@ -39,7 +39,7 @@ async def purge_session(session_id: str):
     return {"status": "SUCCESS: Session completely zeroed and erased from memory."}
 
 @router.post("/audio-chunk")
-async def transcribe_chunk(session_id: str, audio_chunk: UploadFile = File(...)):
+async def transcribe_chunk(session_id: str = Form(...), audio_chunk: UploadFile = File(...)):
     audio_bytes: bytes = await audio_chunk.read()
 
     ext = audio_chunk.filename.split(".")[-1] if audio_chunk.filename and "." in audio_chunk.filename else "wav"
