@@ -14,3 +14,11 @@ table {
 th, td {
     border: 1px solid black;
 }
+
+#recording_session {
+    display:none;
+}
+
+#patient_alias {
+    display:flex;
+}

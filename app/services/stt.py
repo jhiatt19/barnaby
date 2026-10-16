@@ -1,5 +1,27 @@
+import os
+import sys
 from faster_whisper import WhisperModel
 import io
+import av
+import site
+
+if sys.platform == "win32":
+    for site_pkg in site.getsitepackages():
+        cublas_dir = os.path.join(site_pkg, "nvidia", "cublas", "bin")
+        cudnn_dir = os.path.join(site_pkg, "nvidia", "cudnn", "bin")
+        if os.path.exists(cublas_dir):
+            os.add_dll_directory(cublas_dir)
+        if os.path.exists(cudnn_dir):
+            os.add_dll_directory(cudnn_dir)
+
+_original_av_open = av.open
+
+def _patched_av_open(*args, **kwargs):
+    # Remove metadata_errors if faster-whisper passes it down
+    kwargs.pop("metadata_errors", None)
+    return _original_av_open(*args, **kwargs)
+
+av.open = _patched_av_open
 
 model = WhisperModel(
         model_size_or_path="base",

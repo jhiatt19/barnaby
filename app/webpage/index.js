@@ -2,14 +2,54 @@ let mediaRecorder;
 let audioChunks = [];
 let currentSession_id = null;
 let recordingInterval = null;
+let activeStream = null;
+
+
+async function startRecordingSession(alias){
+    currentSession_id = crypto.randomUUID();
+    audioChunks = []
+
+    await fetch('http://localhost:8000/api/v1/scribe/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({ session_id: currentSession_id, patient_alias: alias})
+    });
+    activeStream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    mediaRecorder = new MediaRecorder(activeStream, { mimeType: 'audio/webm' });
+
+    mediaRecorder.ondataavailable = async(event) => {
+        if (event.data.size > 0) {
+            audioChunks.push(event.data);
+        } 
+    }
+
+    mediaRecorder.onstop = async () => {
+        const completeBlob = new Blob(audioChunks, {type: 'audio/webm'});
+
+        const formData = new FormData();
+        formData.append("session_id",currentSession_id);
+        formData.append("audio_chunk", completeBlob, "recording.webm");
+        console.log(formData);
+        await fetch('http://localhost:8000/api/v1/scribe/audio-chunk', {
+                method: 'POST',
+                body: formData
+            });
+    }
+    showView("recording_session","patient_alias")
+    mediaRecorder.start();
+    console.log("Recording started");
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchSessions();
+    // fetchSessions();
 
-    const form = document.getElementById('#new-patient');
+    const form = document.getElementById('new_patient');
+    console.log(form);
     form.addEventListener('submit', async(event) => {
         event.preventDefault();
-        const input = document.querySelector('#patient_id');
+        console.log(document.getElementById('patient_id'));
+        const input = document.getElementById('patient_id');
         const alias = input.value.trim();
 
         if (!alias) return;
@@ -17,7 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
         await startRecordingSession(alias);
         input.value = '';
     });
-    const tbody = document.querySelector('#sessions tbody');
+
+    const stopBtn = document.getElementById('stop');
+    if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+
+            if (activeStream) {
+                activeStream.getTracks().forEach(track => track.stop());
+            }
+            showView('patient_alias', 'recording_session');
+            alert("Session recording stopped and saved to volatile memory!");
+        });
+    }
+    const tbody = document.querySelector('sessions tbody');
     tbody.addEventListener('click', (e) => {
         if (e.target.classList.contains('finalize-btn')) {
             const sessionId = e.target.getAttribute('data-id');
@@ -37,7 +92,7 @@ async function fetchSessions(){
 
         const records = await response.json();
 
-        const tbody = document.querySelector('#sessions tbody');
+        const tbody = document.querySelector('sessions tbody');
         tbody.innerHTML = '';
 
         records.forEach(record => {
@@ -55,31 +110,7 @@ async function fetchSessions(){
     }
 }
 
-async function startRecordingSession(alias){
-    currentSession_id = crypto.randomUUID();
 
-    await fetch('http://localhost:8000/api/v1/scribe/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({ session_id: currentSession_id, patient_alias: patient_alias})
-    });
-    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-
-    mediaRecorder.ondataavailable = async(event) => {
-        if (event.data.size > 0) {
-            const formData = new FormData();
-            formData.append("session_id", currentSession_id);
-            formData.append("audio_chunk", event.data, "chunk.webm");
-
-            await fetch('http://localhost:8000/api/v1/scribe/audio-chunk', {
-                method: 'POST',
-                body: formData
-            });
-        }
-    }
-    mediaRecorder.start(5000);
-}
 
 async function summarize(sessionId) {
     try {
@@ -110,4 +141,9 @@ async function summarize(sessionId) {
     } catch (error) {
         console.error("Error finalizing session:",error);
     }    
+}
+
+function showView(viewIdOn,viewIdOff) {
+    document.getElementById(viewIdOff).style.display = 'none';
+    document.getElementById(viewIdOn).style.display = 'block';
 }

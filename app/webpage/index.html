@@ -14,26 +14,18 @@
             <h1>Barnaby: Clinical Scribe</h1>
         </header>
         <main>
-            <form id="new_patient">
-                <div class="new_patient_group">
-                    <label for="patient_id">Patient Name/Alias:</label>
-                    <input type="text" id="patient_id">
-                    <button type="submit">Begin Recording</button>
-                </div>
-            </form>
-            <table id="sessions">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Patient Name</th>
-                        <th>To do:</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-
-            </table>
+            <div id="patient_alias">
+                <form id="new_patient">
+                    <div class="new_patient_group">
+                        <label for="patient_id">Patient Name/Alias:</label>
+                        <input type="text" id="patient_id" required>
+                        <button type="submit">Begin Recording</button>
+                    </div>
+                </form>
+            </div>
+            <div id="recording_session">
+                <button id="stop" type="submit">Stop Recording</button>
+            </div>
             <script type="module" src="index.js"></script>
         </main>
     </body>
