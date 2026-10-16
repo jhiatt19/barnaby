@@ -42,5 +42,12 @@ class VolatileScribeMemory:
             return True
         return False
 
+    def list_active_sessions(self) -> list:
+        output_active_list = []
+        for session_id, data in self._active_sessions.items():
+            output_active_list.append({"session_id":session_id, "patient_alias":data.get("alias","Patient"), "created_at": data.get("created_at")})
+        return output_active_list
+
+
 # Global instance initialized once in memory
 scribe_memory = VolatileScribeMemory()
